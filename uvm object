@@ -1,0 +1,18 @@
+virtual class uvm_object extends uvm_void;
+  function new (string name=""); //creates a uvm object with given name but empty by default
+
+//Utility functions
+  function void print(uvm_printer printer=null);
+  function void copy(uvm_object rhs,uvm_copier copier=null);
+  function bit compare(uvm_object rhs,uvm_compare comparer=null);
+  function void record(uvm_recorder recorder=null);
+
+//these function to be redefined by the child classes
+  virtual function uvm_object create(string name="");
+        return null;
+  endfunction
+
+  virtual function string get_type_name();
+        return "";
+  endfunction
+endclass
