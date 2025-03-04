@@ -1,0 +1,762 @@
+//All phases execution
+
+
+`include "uvm_macros.svh"
+import uvm_pkg::*;
+ 
+class test extends uvm_test;
+  `uvm_component_utils(test)
+  
+  function new(string path = "test", uvm_component parent = null);
+    super.new(path, parent);
+  endfunction
+  
+  
+  ////////////////////////////Construction Phases
+  
+  function void build_phase(uvm_phase phase);
+    super.build_phase(phase);
+    
+    
+    `uvm_info("test","Build Phase Executed", UVM_NONE);
+  endfunction
+  
+  
+  
+  function void connect_phase(uvm_phase phase);
+    super.connect_phase(phase);
+    `uvm_info("test","Connect Phase Executed", UVM_NONE);
+  endfunction
+ 
+  
+  function void end_of_elaboration_phase(uvm_phase phase);
+    super.end_of_elaboration_phase(phase);
+    `uvm_info("test","End of Elaboration Phase Executed", UVM_NONE);
+  endfunction
+ 
+    function void start_of_simulation_phase(uvm_phase phase);
+    super.start_of_simulation_phase(phase);
+    `uvm_info("test","Start of Simulation Phase Executed", UVM_NONE);
+  endfunction
+ 
+  
+  //////////////////////////////Main Phases
+  
+  
+  task run_phase(uvm_phase phase);
+    `uvm_info("test", "Run Phase", UVM_NONE);   
+  endtask
+  
+  
+  //////////////////////////Cleanup Phases
+  
+  function void extract_phase(uvm_phase phase);
+    super.extract_phase(phase);
+    `uvm_info("test", "Extract Phase", UVM_NONE); 
+  endfunction
+  
+  
+  function void check_phase(uvm_phase phase);
+    super.check_phase(phase);
+    `uvm_info("test", "Check Phase", UVM_NONE); 
+  endfunction
+  
+  
+  function void report_phase(uvm_phase phase);
+    super.report_phase(phase);
+    `uvm_info("test", "Report Phase", UVM_NONE); 
+  endfunction
+  
+  function void final_phase(uvm_phase phase);
+    super.final_phase(phase);
+      `uvm_info("test", "Final Phase", UVM_NONE); 
+  endfunction
+  
+  
+  
+  
+endclass
+ 
+ 
+module tb;
+  
+  initial begin
+    run_test("test");
+  end
+  
+ 
+endmodule
+
+///----------------------------------------------------------------------
+
+
+//BUILD PHASE TOP DOWN APPROACH
+
+
+`include "uvm_macros.svh"
+import uvm_pkg::*;
+ 
+ 
+ 
+class driver extends uvm_driver;
+  `uvm_component_utils(driver) 
+  
+  
+  function new(string path = "test", uvm_component parent = null);
+    super.new(path, parent);
+  endfunction
+  
+  function void build_phase(uvm_phase phase);
+    super.build_phase(phase);
+    `uvm_info("driver","Driver Build Phase Executed", UVM_NONE);  
+  endfunction
+  
+endclass
+ 
+///////////////////////////////////////////////////////////////
+ 
+class monitor extends uvm_monitor;
+  `uvm_component_utils(monitor) 
+  
+  
+  function new(string path = "monitor", uvm_component parent = null);
+    super.new(path, parent);
+  endfunction
+  
+  function void build_phase(uvm_phase phase);
+    super.build_phase(phase);
+    `uvm_info("monitor","Monitor Build Phase Executed", UVM_NONE); 
+  endfunction
+  
+endclass
+ 
+////////////////////////////////////////////////////////////////////////////////////
+ 
+class env extends uvm_env;
+  `uvm_component_utils(env) 
+  
+  driver drv;
+  monitor mon;
+  
+  function new(string path = "env", uvm_component parent = null);
+    super.new(path, parent);
+  endfunction
+  
+  function void build_phase(uvm_phase phase);
+    super.build_phase(phase);
+    `uvm_info("env","Env Build Phase Executed", UVM_NONE);
+    drv = driver::type_id::create("drv", this);
+    mon = monitor::type_id::create("mon", this);
+  endfunction
+  
+endclass
+ 
+ 
+ 
+////////////////////////////////////////////////////////////////////////////////////////
+ 
+class test extends uvm_test;
+  `uvm_component_utils(test)
+  
+  env e;
+  
+  function new(string path = "test", uvm_component parent = null);
+    super.new(path, parent);
+  endfunction
+  
+  function void build_phase(uvm_phase phase);
+    super.build_phase(phase);
+    `uvm_info("test","Test Build Phase Executed", UVM_NONE);
+    e = env::type_id::create("e", this);
+  endfunction
+  
+endclass
+ 
+///////////////////////////////////////////////////////////////////////////
+module tb;
+  
+  initial begin
+    run_test("test");
+  end
+  
+ 
+endmodule
+
+//----------------------------------------------------------------------------------------
+
+//Connect phase
+`include "uvm_macros.svh"
+import uvm_pkg::*;
+ 
+ 
+ 
+ 
+///////////////////////////////////////////////////////////////
+ 
+class driver extends uvm_driver;
+  `uvm_component_utils(driver) 
+  
+  
+  function new(string path = "test", uvm_component parent = null);
+    super.new(path, parent);
+  endfunction
+  
+  function void connect_phase(uvm_phase phase);
+    super.connect_phase(phase);
+    `uvm_info("driver","Driver Connect Phase Executed", UVM_NONE);
+  endfunction
+  
+endclass
+ 
+///////////////////////////////////////////////////////////////
+ 
+class monitor extends uvm_monitor;
+  `uvm_component_utils(monitor) 
+  
+  
+  function new(string path = "monitor", uvm_component parent = null);
+    super.new(path, parent);
+  endfunction
+  
+  function void connect_phase(uvm_phase phase);
+    super.connect_phase(phase);
+    `uvm_info("monitor","Monitor Connect Phase Executed", UVM_NONE);   
+  endfunction
+  
+endclass
+ 
+////////////////////////////////////////////////////////////////////////////////////
+ 
+class env extends uvm_env;
+  `uvm_component_utils(env) 
+  
+  driver d;
+  monitor m;
+  
+  function new(string path = "env", uvm_component parent = null);
+    super.new(path, parent);
+  endfunction
+  
+  function void build_phase(uvm_phase phase);
+    super.build_phase(phase);
+    d = driver::type_id::create("d", this);
+    m = monitor::type_id::create("m", this);
+  endfunction
+  
+  
+  
+  function void connect_phase(uvm_phase phase);
+    super.connect_phase(phase);
+    `uvm_info("env","Env Connect Phase Executed", UVM_NONE);
+  endfunction
+  
+endclass
+ 
+ 
+ 
+////////////////////////////////////////////////////////////////////////////////////////
+ 
+class test extends uvm_test;
+  `uvm_component_utils(test)
+  
+  env e;
+  
+  function new(string path = "test", uvm_component parent = null);
+    super.new(path, parent);
+  endfunction
+  
+  function void build_phase(uvm_phase phase);
+    super.build_phase(phase);
+    e = env::type_id::create("e", this);
+  endfunction
+  
+  
+  
+  function void connect_phase(uvm_phase phase);
+    super.connect_phase(phase);
+    `uvm_info("test","Test Connect Phase Executed", UVM_NONE);
+  endfunction
+  
+endclass
+ 
+///////////////////////////////////////////////////////////////////////////
+module tb;
+  
+  initial begin
+    run_test("test");
+  end
+  
+ 
+endmodule
+
+//------------------------------------------------------------------------------
+
+//Execution of Multiple instance phases
+
+//Raising objection
+`include "uvm_macros.svh"
+import uvm_pkg::*;
+ 
+ 
+class comp extends uvm_component;
+  `uvm_component_utils(comp)
+  
+ 
+  function new(string path = "comp", uvm_component parent = null);
+    super.new(path, parent);
+  endfunction
+  
+  task reset_phase(uvm_phase phase);
+    phase.raise_objection(this);
+    `uvm_info("comp","Reset Started", UVM_NONE);
+     #10;
+    `uvm_info("comp","Reset Completed", UVM_NONE);
+    phase.drop_objection(this);
+  endtask
+  
+  
+endclass
+ 
+///////////////////////////////////////////////////////////////////////////
+module tb;
+  
+  initial begin
+    run_test("comp");
+  end
+  
+ 
+endmodule
+
+//-------------------------------------------------------------------------------------------------
+
+//Time consuming pahses in single component
+
+`include "uvm_macros.svh"
+import uvm_pkg::*;
+ 
+ 
+class comp extends uvm_component;
+  `uvm_component_utils(comp)
+  
+ 
+  function new(string path = "comp", uvm_component parent = null);
+    super.new(path, parent);
+  endfunction
+  
+  task reset_phase(uvm_phase phase);
+    phase.raise_objection(this);
+    `uvm_info("comp","Reset Started", UVM_NONE);
+     #10;
+    `uvm_info("comp","Reset Completed", UVM_NONE);
+    phase.drop_objection(this);
+  endtask
+  
+  task main_phase(uvm_phase phase);
+    phase.raise_objection(this);
+    `uvm_info("mon", " Main Phase Started", UVM_NONE);
+    #100;
+    `uvm_info("mon", " Main Phase Ended", UVM_NONE);
+    phase.drop_objection(this);
+  endtask
+  
+  
+  
+endclass
+ 
+///////////////////////////////////////////////////////////////////////////
+module tb;
+  
+  initial begin
+    run_test("comp");
+  end
+  
+ 
+endmodule
+//-----------------------------------------------------------------------------------------------
+
+
+//Time consuming phases in multiple components
+
+`include "uvm_macros.svh"
+import uvm_pkg::*;
+ 
+ 
+ 
+ 
+///////////////////////////////////////////////////////////////
+ 
+class driver extends uvm_driver;
+  `uvm_component_utils(driver) 
+  
+  
+  function new(string path = "test", uvm_component parent = null);
+    super.new(path, parent);
+  endfunction
+  
+  task reset_phase(uvm_phase phase);
+    phase.raise_objection(this);
+    `uvm_info("drv", "Driver Reset Started", UVM_NONE);
+    #100;
+    `uvm_info("drv", "Driver Reset Ended", UVM_NONE);
+    phase.drop_objection(this);
+  endtask
+  
+  
+  task main_phase(uvm_phase phase);
+    phase.raise_objection(this);
+    `uvm_info("drv", "Driver Main Phase Started", UVM_NONE);
+    #100;
+    `uvm_info("drv", "Driver Main Phase Ended", UVM_NONE);
+    phase.drop_objection(this);
+  endtask
+  
+  
+ 
+  
+endclass
+ 
+///////////////////////////////////////////////////////////////
+ 
+class monitor extends uvm_monitor;
+  `uvm_component_utils(monitor) 
+  
+  
+  function new(string path = "monitor", uvm_component parent = null);
+    super.new(path, parent);
+  endfunction
+  
+  task reset_phase(uvm_phase phase);
+    phase.raise_objection(this);
+    `uvm_info("mon", "Monitor Reset Started", UVM_NONE);
+     #300;
+    `uvm_info("mon", "Monitor Reset Ended", UVM_NONE);
+    phase.drop_objection(this);
+  endtask
+  
+  
+  task main_phase(uvm_phase phase);
+    phase.raise_objection(this);
+    `uvm_info("mon", "Monitor Main Phase Started", UVM_NONE);
+     #400;
+    `uvm_info("mon", "Monitor Main Phase Ended", UVM_NONE);
+    phase.drop_objection(this);
+  endtask
+  
+endclass
+ 
+////////////////////////////////////////////////////////////////////////////////////
+ 
+class env extends uvm_env;
+  `uvm_component_utils(env) 
+  
+  driver d;
+  monitor m;
+  
+  function new(string path = "env", uvm_component parent = null);
+    super.new(path, parent);
+  endfunction
+  
+  function void build_phase(uvm_phase phase);
+    super.build_phase(phase);
+    d = driver::type_id::create("d", this);
+    m = monitor::type_id::create("m", this);
+  endfunction
+  
+ 
+  
+endclass
+ 
+ 
+ 
+////////////////////////////////////////////////////////////////////////////////////////
+ 
+class test extends uvm_test;
+  `uvm_component_utils(test)
+  
+  env e;
+  
+  function new(string path = "test", uvm_component parent = null);
+    super.new(path, parent);
+  endfunction
+  
+  function void build_phase(uvm_phase phase);
+    super.build_phase(phase);
+    e = env::type_id::create("e", this);
+  endfunction
+  
+  
+endclass
+ 
+///////////////////////////////////////////////////////////////////////////
+module tb;
+  
+  initial begin
+    run_test("test");
+  end
+  
+ 
+endmodule
+
+//----------------------------------------------------------------------------------------------------
+
+
+//timeout
+
+`include "uvm_macros.svh"
+import uvm_pkg::*;
+///default : 9200sec
+ 
+ 
+class comp extends uvm_component;
+  `uvm_component_utils(comp)
+  
+ 
+  function new(string path = "comp", uvm_component parent = null);
+    super.new(path, parent);
+  endfunction
+  
+  task reset_phase(uvm_phase phase);
+    phase.raise_objection(this);
+    `uvm_info("comp","Reset Started", UVM_NONE);
+     #10;
+    `uvm_info("comp","Reset Completed", UVM_NONE);
+    phase.drop_objection(this);
+  endtask
+  
+  task main_phase(uvm_phase phase);
+    phase.raise_objection(this);
+    `uvm_info("mon", " Main Phase Started", UVM_NONE);
+    #100;
+    `uvm_info("mon", " Main Phase Ended", UVM_NONE);
+    phase.drop_objection(this);
+  endtask
+  
+  
+  function void build_phase(uvm_phase phase);
+    super.build_phase(phase); 
+  endfunction
+  
+  
+endclass
+ 
+///////////////////////////////////////////////////////////////////////////
+module tb;
+  
+  initial begin
+ 
+    uvm_top.set_timeout(100ns, 0);
+    run_test("comp");
+  end
+  
+ 
+endmodule
+
+//---------------------------------------------------------------------------------------------------
+
+
+//Drain Time individula component
+
+`include "uvm_macros.svh"
+import uvm_pkg::*;
+/////Default Timeout = 9200sec
+ 
+ 
+class comp extends uvm_component;
+  `uvm_component_utils(comp)
+  
+ 
+  function new(string path = "comp", uvm_component parent = null);
+    super.new(path, parent);
+  endfunction
+  
+  task reset_phase(uvm_phase phase);
+    phase.raise_objection(this);
+    `uvm_info("comp","Reset Started", UVM_NONE);
+     #10;
+    `uvm_info("comp","Reset Completed", UVM_NONE);
+    phase.drop_objection(this);
+  endtask
+  
+  task main_phase(uvm_phase phase);
+    phase.phase_done.set_drain_time(this,200);
+    phase.raise_objection(this);
+    `uvm_info("mon", " Main Phase Started", UVM_NONE);
+    #100;
+    `uvm_info("mon", " Main Phase Ended", UVM_NONE);
+    phase.drop_objection(this);
+  endtask
+  
+  task post_main_phase(uvm_phase phase);
+    `uvm_info("mon", " Post-Main Phase Started", UVM_NONE);
+  endtask
+  
+  function void build_phase(uvm_phase phase);
+    super.build_phase(phase); 
+  endfunction
+  
+  
+endclass
+ 
+///////////////////////////////////////////////////////////////////////////
+module tb;
+  
+  initial begin
+   // uvm_top.set_timeout(100ns, 0);
+    
+    run_test("comp");
+  end
+  
+ 
+endmodule
+
+//--------------------------------------------------------------------------------------------
+
+//Darin time multiple component
+`include "uvm_macros.svh"
+import uvm_pkg::*;
+ 
+ 
+ 
+ 
+///////////////////////////////////////////////////////////////
+ 
+class driver extends uvm_driver;
+  `uvm_component_utils(driver) 
+  
+  
+  function new(string path = "test", uvm_component parent = null);
+    super.new(path, parent);
+  endfunction
+  
+  task reset_phase(uvm_phase phase);
+    phase.raise_objection(this);
+    `uvm_info("drv", "Driver Reset Started", UVM_NONE);
+    #100;
+    `uvm_info("drv", "Driver Reset Ended", UVM_NONE);
+    phase.drop_objection(this);
+  endtask
+  
+  
+  task main_phase(uvm_phase phase);
+    phase.raise_objection(this);
+    `uvm_info("drv", "Driver Main Phase Started", UVM_NONE);
+    #100;
+    `uvm_info("drv", "Driver Main Phase Ended", UVM_NONE);
+    phase.drop_objection(this);
+  endtask
+  
+  task post_main_phase(uvm_phase phase);
+    `uvm_info("drv", "Driver Post-Main Phase Started", UVM_NONE);  
+  endtask
+  
+ 
+  
+endclass
+ 
+///////////////////////////////////////////////////////////////
+ 
+class monitor extends uvm_monitor;
+  `uvm_component_utils(monitor) 
+  
+  
+  function new(string path = "monitor", uvm_component parent = null);
+    super.new(path, parent);
+  endfunction
+  
+  task reset_phase(uvm_phase phase);
+    phase.raise_objection(this);
+    `uvm_info("mon", "Monitor Reset Started", UVM_NONE);
+     #150;
+    `uvm_info("mon", "Monitor Reset Ended", UVM_NONE);
+    phase.drop_objection(this);
+  endtask
+  
+  
+  task main_phase(uvm_phase phase);
+    phase.raise_objection(this);
+    `uvm_info("mon", "Monitor Main Phase Started", UVM_NONE);
+     #200;
+    `uvm_info("mon", "Monitor Main Phase Ended", UVM_NONE);
+    phase.drop_objection(this);
+  endtask
+  
+  task post_main_phase(uvm_phase phase);
+    `uvm_info("mon", "Monitor Post-Main Phase Started", UVM_NONE);  
+  endtask
+  
+endclass
+ 
+////////////////////////////////////////////////////////////////////////////////////
+ 
+class env extends uvm_env;
+  `uvm_component_utils(env) 
+  
+  driver d;
+  monitor m;
+  
+  function new(string path = "env", uvm_component parent = null);
+    super.new(path, parent);
+  endfunction
+  
+  function void build_phase(uvm_phase phase);
+    super.build_phase(phase);
+    d = driver::type_id::create("d", this);
+    m = monitor::type_id::create("m", this);
+  endfunction
+  
+ 
+  
+endclass
+ 
+ 
+ 
+////////////////////////////////////////////////////////////////////////////////////////
+ 
+class test extends uvm_test;
+  `uvm_component_utils(test)
+  
+  env e;
+  
+  function new(string path = "test", uvm_component parent = null);
+    super.new(path, parent);
+  endfunction
+  
+  function void build_phase(uvm_phase phase);
+    super.build_phase(phase);
+    e = env::type_id::create("e", this);
+  endfunction
+  
+ function void end_of_elaboration_phase(uvm_phase phase);
+   uvm_phase main_phase;
+   super.end_of_elaboration_phase(phase);
+    main_phase = phase.find_by_name("main", 0);
+    main_phase.phase_done.set_drain_time(this, 100);
+  endfunction
+  
+  
+endclass
+ 
+///////////////////////////////////////////////////////////////////////////
+module tb;
+  
+  initial begin
+    run_test("test");
+  end
+  
+ 
+endmodule
+//---------------------------------------------------------------------------------------
+
+
+//phase debug switch
+
++UVM_PHASE_TRACE
+
+//-----------------------------------------------------------------------------------------
+
+Objection Debug Switch
++UVM_OBJECTION_TRACE
+
+//------------------------------------------------------------------------------------------
+
+
